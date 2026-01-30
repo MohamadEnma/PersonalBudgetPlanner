@@ -261,22 +261,31 @@ namespace PersonalBudgetPlanner.ViewModels
 
         public void CalculateForecastWithAbsence(UserProfile profile, IEnumerable<Absence> monthlyAbsences)
         {
+            // Starta med nettolön (redan skattad)
             CalculateForecast(profile);
 
             decimal totalImpact = 0;
-            foreach (var absence in monthlyAbsences)
+            // Gruppera frånvaro per typ så att vi inte får flera karensavdrag för samma sjukperiod
+            var groupedAbsences = monthlyAbsences.GroupBy(a => a.Type);
+
+            foreach (var group in groupedAbsences)
             {
                 decimal hourlyRate = profile.AnnualWorkHours > 0 ? profile.AnnualIncome / (decimal)profile.AnnualWorkHours : 0;
+                int totalHoursForType = group.Sum(a => a.HoursMissed);
 
-                decimal deduction = _budgetService.CalculateAbsenceDeduction(
+                // 1. Vad försvinner från nettolönen? (Bruttoavdrag * 0.7)
+                decimal grossDeduction = _budgetService.CalculateAbsenceDeduction(
                     profile.AnnualIncome,
                     profile.AnnualWorkHours,
-                    absence.HoursMissed,
-                    absence.Type);
+                    totalHoursForType,
+                    group.Key);
 
-                decimal compensation = _budgetService.CalculateCompensation(deduction, absence.Type, hourlyRate);
+                decimal netDeduction = grossDeduction * 0.70m;
 
-                totalImpact += (compensation - deduction);
+                // 2. Vad får vi in i ersättning? (Använder nu korrigerad service)
+                decimal netCompensation = _budgetService.CalculateCompensation(grossDeduction, group.Key, hourlyRate);
+
+                totalImpact += (netCompensation - netDeduction);
             }
 
             ForecastResult += totalImpact;

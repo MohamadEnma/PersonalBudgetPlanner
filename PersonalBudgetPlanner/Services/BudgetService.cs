@@ -40,12 +40,19 @@ namespace PersonalBudgetPlanner.Services
         {
             if (type == AbsenceType.VAB)
             {
-                return deduction * 0.80m; 
+                // VAB-ersättning är skattepliktig, så vi räknar netto direkt
+                return (deduction * 0.80m) * 0.70m;
             }
-            decimal grossSickPay = deduction * 0.80m;
-            decimal karensAmount = (hourlyRate * 8.0m) * 0.80m;
 
-            return Math.Max(0, grossSickPay - karensAmount);
+            // Sjuklön (80%)
+            decimal grossSickPay = deduction * 0.80m;
+
+            // Karensavdraget (20% av vecko-sjuklönen)
+            decimal maxKarens = (hourlyRate * 8.0m) * 0.80m;
+            decimal actualKarens = Math.Min(grossSickPay, maxKarens);
+
+            // Netto efter 30% skatt
+            return (grossSickPay - actualKarens) * 0.70m;
         }
     }
 }
