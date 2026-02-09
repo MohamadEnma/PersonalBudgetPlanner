@@ -10,17 +10,18 @@
         Title="Personal Budget Planner" Height="700" Width="1050"
         Background="#FFF6F7FB" FontFamily="Segoe UI">
 
-<Window.Resources>
-    <DataTemplate DataType="{x:Type viewModels:BudgetViewModel}">
-        <views:BudgetMainContent />
-    </DataTemplate>
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:BudgetViewModel}">
+            <views:BudgetMainContent />
+        </DataTemplate>
 
-    <DataTemplate DataType="{x:Type viewModels:ProfileViewModel}">
-        <views:ProfileView />
-    </DataTemplate>
-</Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:ProfileViewModel}">
+            <views:ProfileView />
+        </DataTemplate>
 
-<Grid Margin="10">
+    </Window.Resources>
+
+    <Grid Margin="10">
     <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="*"/>

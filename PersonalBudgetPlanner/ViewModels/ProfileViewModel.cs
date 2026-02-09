@@ -1,12 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PersonalBudgetPlanner.Commands;
-using PersonalBudgetPlanner.Data;
+﻿using PersonalBudgetPlanner.Commands;
 using PersonalBudgetPlanner.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PersonalBudgetPlanner.Services;
 
 namespace PersonalBudgetPlanner.ViewModels
 {
@@ -14,6 +8,7 @@ namespace PersonalBudgetPlanner.ViewModels
     {
         private UserProfile _userProfile;
         private readonly BudgetViewModel _parentViewModel;
+        private readonly IBudgetService _budgetService; // Use the service!
 
         public UserProfile UserProfile
         {
@@ -24,45 +19,38 @@ namespace PersonalBudgetPlanner.ViewModels
         public DelegateCommand SaveProfileCommand { get; }
         public DelegateCommand BackCommand { get; }
 
-        public ProfileViewModel(BudgetViewModel parent)
+        public ProfileViewModel(BudgetViewModel parent, IBudgetService budgetService)
         {
             _parentViewModel = parent;
+            _budgetService = budgetService;
+
             LoadProfile();
 
-            SaveProfileCommand = new DelegateCommand(ExecuteSave);
+            // Simplified synchronous commands
+            SaveProfileCommand = new DelegateCommand(_ => ExecuteSave());
             BackCommand = new DelegateCommand(_ => _parentViewModel.CurrentView = _parentViewModel);
         }
 
         private void LoadProfile()
         {
-            using (var db = new AppDbContext())
-            {         
-                UserProfile = db.UserProfiles.FirstOrDefault() ?? new UserProfile
-                {
-                    AnnualIncome = 0,
-                    AnnualWorkHours = 1920
-                };
-            }
+            // Get from service, not a new context
+            UserProfile = _budgetService.GetCurrentUserProfile() ?? new UserProfile
+            {
+                AnnualIncome = 0,
+                AnnualWorkHours = 1920
+            };
         }
 
-        private void ExecuteSave(object obj)
+        private async Task ExecuteSave()
         {
-            using (var db = new AppDbContext())
-            {
-                var existingProfile = db.UserProfiles.FirstOrDefault(p => p.Id == UserProfile.Id);
-                if (existingProfile == null)
-                {
-                    if (UserProfile.Id == Guid.Empty) UserProfile.Id = Guid.NewGuid();
-                    db.UserProfiles.Add(UserProfile);
-                }
-                else
-                {
-                    db.Entry(existingProfile).CurrentValues.SetValues(UserProfile);
-                }
-                db.SaveChanges();
-            }
-            _parentViewModel.CalculateForecast(UserProfile);
+            // Delegate the DB complexity to the service
+            _budgetService.UpsertUserProfile(UserProfile);
+
+            // Return to parent view
             _parentViewModel.CurrentView = _parentViewModel;
+
+            // Refresh parent data (in case income changed)
+            await _parentViewModel.InitializeAsync();
         }
     }
 }

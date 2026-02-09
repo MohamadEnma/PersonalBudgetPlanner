@@ -2,9 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:oxy="http://oxyplot.org/wpf"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   
+             xmlns:local="clr-namespace:PersonalBudgetPlanner.Services"
              mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1000">
+
+    <UserControl.Resources>
+        <local:DecimalStringConverter x:Key="DecimalConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="320"/>
@@ -19,7 +23,7 @@
                 <TextBox Text="{Binding NewTransaction.Description, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
                 <Label Content="Belopp" Foreground="Gray" Padding="0,5"/>
-                <TextBox Text="{Binding NewTransaction.Amount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                <TextBox Text="{Binding NewTransaction.Amount, Converter={StaticResource DecimalConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                 <Label Content="Kategori" Foreground="Gray" Padding="0,5"/>
                 <ComboBox ItemsSource="{Binding Categories}" 
@@ -85,7 +89,8 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Content="Ta bort" 
-                                        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        Command="{Binding DataContext.DeleteCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
                                         FontSize="10" Background="#E57373" Foreground="White" 
                                         BorderThickness="0" Padding="5,2" Cursor="Hand">
                                     <Button.Resources>

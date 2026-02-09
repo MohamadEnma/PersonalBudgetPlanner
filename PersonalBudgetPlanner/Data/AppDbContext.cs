@@ -10,18 +10,18 @@ namespace PersonalBudgetPlanner.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Absence> Absences { get; set; }
 
-        public AppDbContext()
-        {
-            Database.Migrate();
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var folder = Environment.SpecialFolder.MyDocuments;
-            var path = Environment.GetFolderPath(folder);
-            var dbPath = System.IO.Path.Join(path, "BudgetPlanner.db");
-
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            if (!optionsBuilder.IsConfigured)
+            {
+                var folder = Environment.SpecialFolder.MyDocuments;
+                var path = Environment.GetFolderPath(folder);
+                var dbPath = System.IO.Path.Join(path, "BudgetPlanner.db");
+                optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

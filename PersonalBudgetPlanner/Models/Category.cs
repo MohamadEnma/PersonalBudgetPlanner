@@ -10,7 +10,7 @@ namespace PersonalBudgetPlanner.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
-        public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public  ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
         public TransactionType Type { get; set; }
     }
 }

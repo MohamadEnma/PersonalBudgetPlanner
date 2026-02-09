@@ -16,9 +16,10 @@
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel Margin="0,0,30,0">
-                    <TextBlock Text="LÖN NÄSTA MÅNAD" FontSize="10" Foreground="Gray"/>
-                    <TextBlock Text="{Binding ForecastResult, StringFormat={}{0:C}}" 
-                               FontSize="22" FontWeight="Bold" Foreground="{StaticResource SuccessGreenBrush}"/>
+                    <Button Content="Månadsöversikt" FontSize="10" Foreground="Gray"
+                            Command="{Binding OpenMonthlyOverviewCommand}"
+                            />
+                   
                 </StackPanel>
                 <StackPanel Margin="0,0,30,0">
                     <TextBlock Text="AKTUELL BALANS" FontSize="10" Foreground="Gray"/>

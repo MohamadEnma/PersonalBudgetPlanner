@@ -11,7 +11,7 @@ using PersonalBudgetPlanner.Data;
 namespace PersonalBudgetPlanner.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260130001529_Init")]
+    [Migration("20260209030701_Init")]
     partial class Init
     {
         /// <inheritdoc />

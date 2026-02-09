@@ -13,7 +13,7 @@ namespace PersonalBudgetPlanner.Models
         public decimal Amount { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public Guid CategoryId { get; set; }
-        public virtual Category Category { get; set; }
+        public  Category Category { get; set; }
         public TransactionType Type { get; set; } = TransactionType.Expense;
         public bool IsRecurring { get; set; }
         public RecurrenceFrequency Recurrence { get; set; } = RecurrenceFrequency.None;

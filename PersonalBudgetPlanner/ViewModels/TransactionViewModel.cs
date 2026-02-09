@@ -1,9 +1,5 @@
 ﻿using PersonalBudgetPlanner.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PersonalBudgetPlanner.ViewModels
 {
@@ -15,7 +11,6 @@ namespace PersonalBudgetPlanner.ViewModels
         {
             _model = model ?? new Transaction();
         }
-
 
         public Guid Id => _model.Id;
 
@@ -45,7 +40,6 @@ namespace PersonalBudgetPlanner.ViewModels
             }
         }
 
-
         public DateTime Date
         {
             get => _model.Date;
@@ -58,7 +52,6 @@ namespace PersonalBudgetPlanner.ViewModels
                 }
             }
         }
-
 
         public TransactionType Type
         {
@@ -73,11 +66,7 @@ namespace PersonalBudgetPlanner.ViewModels
             }
         }
 
-        public string CategoryName
-        {
-            get => _model.Category?.Name ?? "Ingen kategori";
-        }
-
+        public string CategoryName => _model.Category?.Name ?? "Ingen kategori";
 
         public RecurrenceFrequency Recurrence
         {
@@ -87,10 +76,11 @@ namespace PersonalBudgetPlanner.ViewModels
                 if (_model.Recurrence != value)
                 {
                     _model.Recurrence = value;
-                    OnPropertyChanged();
+                    // Notify Recurrence changed
+                    OnPropertyChanged(nameof(Recurrence));
+                    // Update IsRecurring in the model and notify that property explicitly
                     _model.IsRecurring = value != RecurrenceFrequency.None;
-                    OnPropertyChanged();
-                   
+                    OnPropertyChanged(nameof(IsRecurring));
                 }
             }
         }
@@ -105,7 +95,10 @@ namespace PersonalBudgetPlanner.ViewModels
                 if (_model.CategoryId != value)
                 {
                     _model.CategoryId = value;
-                    OnPropertyChanged();
+                    // If you want Category to be reloaded, do so in the saving/loading layer.
+                    OnPropertyChanged(nameof(CategoryId));
+                    // Notify that CategoryName may have changed
+                    OnPropertyChanged(nameof(CategoryName));
                 }
             }
         }
@@ -113,3 +106,4 @@ namespace PersonalBudgetPlanner.ViewModels
         public Transaction GetModel() => _model;
     }
 }
+
